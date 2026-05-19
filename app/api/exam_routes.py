@@ -1,0 +1,1 @@
+"""Exam generation route placeholder."""

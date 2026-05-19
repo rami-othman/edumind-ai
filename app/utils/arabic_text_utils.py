@@ -1,0 +1,1 @@
+"""Arabic text utility placeholder."""

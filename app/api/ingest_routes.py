@@ -1,0 +1,1 @@
+"""Content ingestion route placeholder."""

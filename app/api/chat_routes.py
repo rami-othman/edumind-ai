@@ -1,0 +1,1 @@
+"""RAG chat route placeholder."""

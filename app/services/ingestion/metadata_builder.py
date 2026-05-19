@@ -1,0 +1,1 @@
+"""Source metadata builder placeholder."""

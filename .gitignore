@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# IDE and OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Local data and uploads
+data/uploads/*
+data/processed/*
+data/samples/*
+!data/uploads/.gitkeep
+!data/processed/.gitkeep
+!data/samples/.gitkeep
+
+# Vector database and model data
+chroma/
+chromadb/
+.chroma/
+ollama/
+.ollama/
+models/
+
+# Docker and logs
+*.log
+docker-compose.override.yml
