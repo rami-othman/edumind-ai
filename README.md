@@ -6,7 +6,7 @@ The service will support admin educational content ingestion, PDF text extractio
 
 ## Current Milestone
 
-Milestone 1B - Docker Foundation
+Milestone 1C - Dependency Health Checks
 
 ## Implemented
 
@@ -18,6 +18,8 @@ Milestone 1B - Docker Foundation
 - Dockerfile for the FastAPI service
 - Docker Compose services for `ai-service`, `chroma`, and `ollama`
 - Persistent Docker volumes for ChromaDB and Ollama
+- `/health/dependencies` endpoint for lightweight dependency checks
+- ChromaDB and Ollama reachability checks
 
 ## Planned Architecture
 
@@ -50,7 +52,7 @@ docker/               Dockerfile and entrypoint placeholders
 
 The current system has no teacher role. Content is uploaded by admins only.
 
-This milestone intentionally does not include PDF extraction, ChromaDB client logic, Ollama client logic, RAG behavior, citations, exam generation, or answer evaluation.
+This milestone intentionally does not include PDF extraction, ChromaDB document storage/search, Ollama generation, RAG behavior, citations, exam generation, or answer evaluation.
 
 AI logic is not implemented yet. ChromaDB and Ollama run as containers, but models are not auto-pulled.
 
@@ -82,10 +84,16 @@ uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
 ## Test
 
 ```bash
+docker compose up --build
 curl http://localhost:8001/health
+curl http://localhost:8001/health/dependencies
 ```
 
-Expected response:
+`/health` checks only the FastAPI app.
+
+`/health/dependencies` checks FastAPI to ChromaDB and FastAPI to Ollama connectivity. This does not mean AI logic is implemented yet.
+
+Expected `/health` response:
 
 ```json
 {
@@ -98,4 +106,4 @@ Expected response:
 
 ## Next Recommended Step
 
-Milestone 1C - Dependency Health Checks.
+Milestone 2A - PDF Extraction Foundation.
