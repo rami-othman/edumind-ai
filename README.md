@@ -4,13 +4,21 @@ EduMind AI Service is the AI backend foundation for EduMind, an AI-powered educa
 
 The service will support admin educational content ingestion, PDF text extraction, Arabic text cleaning and chunking, embedding generation, vector storage, retrieval-augmented Arabic tutoring answers with source citations, and future exam generation.
 
-## Current Status
+## Current Milestone
 
-Architecture scaffold only. No business logic has been implemented yet.
+Milestone 1A - FastAPI Foundation
 
-## Architecture Direction
+## Implemented
 
-The project is Docker-first and will be built around three future services:
+- FastAPI app initialization
+- Environment settings loader
+- Basic logging setup
+- Basic `/` endpoint
+- Basic `/health` endpoint
+
+## Planned Architecture
+
+The project is Docker-first and will be built around three planned services:
 
 - `ai-service`: FastAPI application for API routes and orchestration.
 - `chroma`: ChromaDB vector database for document chunks and embeddings.
@@ -39,14 +47,31 @@ docker/               Dockerfile and entrypoint placeholders
 
 The current system has no teacher role. Content is uploaded by admins only.
 
-This scaffold intentionally does not include FastAPI route logic, PDF extraction, ChromaDB integration, Ollama integration, RAG behavior, citations, exam generation, or answer evaluation.
+This milestone intentionally does not include Docker setup, PDF extraction, ChromaDB integration, Ollama integration, RAG behavior, citations, exam generation, or answer evaluation.
+
+## Run Locally Without Docker
+
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+```
+
+## Test
+
+```bash
+curl http://localhost:8001/health
+```
+
+Expected response:
+
+```json
+{
+  "status": "ok",
+  "service": "EduMind AI Service",
+  "environment": "development",
+  "version": "0.1.0"
+}
+```
 
 ## Next Recommended Step
 
-Implement the minimal FastAPI foundation:
-
-- Create working `app/main.py`.
-- Add a `/health` endpoint.
-- Add config loading from environment variables.
-- Add a basic Dockerfile.
-- Add working `docker-compose.yml`.
+Docker foundation is planned for the next task.
