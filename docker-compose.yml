@@ -1,1 +1,36 @@
-# TODO: Define Docker Compose services for ai-service, chroma, and ollama.
+services:
+  ai-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: edumind-ai-service
+    env_file:
+      - .env
+    ports:
+      - "8001:8001"
+    volumes:
+      - ./app:/app/app
+      - ./data:/app/data
+    depends_on:
+      - chroma
+      - ollama
+
+  chroma:
+    image: chromadb/chroma:latest
+    container_name: edumind-chroma
+    ports:
+      - "8000:8000"
+    volumes:
+      - chroma_data:/chroma/chroma
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: edumind-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+volumes:
+  chroma_data:
+  ollama_data:

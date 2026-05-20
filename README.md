@@ -6,7 +6,7 @@ The service will support admin educational content ingestion, PDF text extractio
 
 ## Current Milestone
 
-Milestone 1A - FastAPI Foundation
+Milestone 1B - Docker Foundation
 
 ## Implemented
 
@@ -15,10 +15,13 @@ Milestone 1A - FastAPI Foundation
 - Basic logging setup
 - Basic `/` endpoint
 - Basic `/health` endpoint
+- Dockerfile for the FastAPI service
+- Docker Compose services for `ai-service`, `chroma`, and `ollama`
+- Persistent Docker volumes for ChromaDB and Ollama
 
 ## Planned Architecture
 
-The project is Docker-first and will be built around three planned services:
+The project is Docker-first and now runs three services:
 
 - `ai-service`: FastAPI application for API routes and orchestration.
 - `chroma`: ChromaDB vector database for document chunks and embeddings.
@@ -47,7 +50,28 @@ docker/               Dockerfile and entrypoint placeholders
 
 The current system has no teacher role. Content is uploaded by admins only.
 
-This milestone intentionally does not include Docker setup, PDF extraction, ChromaDB integration, Ollama integration, RAG behavior, citations, exam generation, or answer evaluation.
+This milestone intentionally does not include PDF extraction, ChromaDB client logic, Ollama client logic, RAG behavior, citations, exam generation, or answer evaluation.
+
+AI logic is not implemented yet. ChromaDB and Ollama run as containers, but models are not auto-pulled.
+
+## Run With Docker
+
+```bash
+docker compose up --build
+```
+
+## Stop Docker
+
+```bash
+docker compose down
+```
+
+## Optional Future Model Pulls
+
+```bash
+docker compose exec ollama ollama pull gemma3:12b
+docker compose exec ollama ollama pull nomic-embed-text
+```
 
 ## Run Locally Without Docker
 
@@ -74,4 +98,4 @@ Expected response:
 
 ## Next Recommended Step
 
-Docker foundation is planned for the next task.
+Milestone 1C - Dependency Health Checks.

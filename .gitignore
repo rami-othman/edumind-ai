@@ -33,15 +33,20 @@ data/samples/*
 !data/uploads/.gitkeep
 !data/processed/.gitkeep
 !data/samples/.gitkeep
+*.pdf
+*.zip
 
 # Vector database and model data
 chroma/
 chromadb/
 .chroma/
+chroma_data/
 ollama/
 .ollama/
+ollama_data/
 models/
 
 # Docker and logs
 *.log
+logs/
 docker-compose.override.yml
