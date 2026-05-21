@@ -2,6 +2,7 @@
 
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -21,12 +22,24 @@ class Settings(BaseSettings):
     ollama_llm_model: str = "gemma3:12b"
     ollama_embedding_model: str = "nomic-embed-text"
 
+    embedding_provider: str = "ollama"
+    embedding_dimension: int | None = None
+    google_embedding_model: str = "gemini-embedding-2"
+    google_embedding_dimension: int = 768
+
     upload_dir: str = "/app/data/uploads"
     processed_dir: str = "/app/data/processed"
 
     chunk_size: int = 800
     chunk_overlap: int = 150
     top_k: int = 5
+
+    @field_validator("embedding_dimension", mode="before")
+    @classmethod
+    def parse_optional_embedding_dimension(cls, value: object) -> object:
+        if value == "":
+            return None
+        return value
 
     model_config = SettingsConfigDict(
         env_file=".env",

@@ -6,7 +6,7 @@ The service will support admin educational content ingestion, PDF text extractio
 
 ## Current Milestone
 
-Milestone 1C - Dependency Health Checks
+Milestone 3A - Embedding Client Foundation
 
 ## Implemented
 
@@ -20,6 +20,29 @@ Milestone 1C - Dependency Health Checks
 - Persistent Docker volumes for ChromaDB and Ollama
 - `/health/dependencies` endpoint for lightweight dependency checks
 - ChromaDB and Ollama reachability checks
+- PDF existence and extension validation
+- Page-by-page PDF text extraction with PyMuPDF
+- 1-based extracted PDF page numbers
+- Lightweight PDF extractor tests using generated temporary PDFs
+- Conservative Arabic-safe text cleaner
+- Whitespace, newline, repeated empty line, and simple punctuation spacing cleanup
+- Lightweight text cleaner tests
+- Page-based text chunker
+- Chunk size and overlap support
+- Page number, chunk index, and character position preservation
+- Lightweight chunker tests
+- Document metadata and chunk record models
+- Flat metadata builder for future vector storage
+- Lightweight metadata builder tests
+- In-memory ingestion preview service
+- Extraction, cleaning, chunking, and metadata connection
+- Empty page tracking
+- Lightweight ingestion preview tests with generated temporary PDFs
+- Embedding provider configuration
+- Ollama embedding client using `/api/embed`
+- Embedding service abstraction
+- Mocked embedding service tests
+- Future Google embedding placeholder configuration
 
 ## Planned Architecture
 
@@ -52,9 +75,105 @@ docker/               Dockerfile and entrypoint placeholders
 
 The current system has no teacher role. Content is uploaded by admins only.
 
-This milestone intentionally does not include PDF extraction, ChromaDB document storage/search, Ollama generation, RAG behavior, citations, exam generation, or answer evaluation.
+This milestone intentionally does not include OCR, API upload logic, document ID generation strategy, Google embedding provider, ChromaDB document storage/search, vector search, RAG behavior, citations, exam generation, or answer evaluation.
 
 AI logic is not implemented yet. ChromaDB and Ollama run as containers, but models are not auto-pulled.
+
+## PDF Extraction Foundation
+
+The project can now extract text from PDF files page by page using PyMuPDF.
+
+Large book PDFs should be placed locally under:
+
+`data/uploads/books/`
+
+They are ignored by Git and should not be committed.
+
+Current limitation:
+- OCR is not implemented yet.
+- Scanned/image-only PDFs may return empty text.
+
+## Arabic Text Cleaning
+
+The project includes a conservative Arabic-safe text cleaner in:
+
+`app/services/ingestion/text_cleaner.py`
+
+It normalizes whitespace, newlines, repeated empty lines, and simple punctuation spacing while preserving Arabic meaning.
+
+Current limitation:
+- It does not perform OCR.
+- It does not remove diacritics.
+- It does not aggressively normalize Arabic letters.
+- It does not modify equations.
+
+## Chunking Foundation
+
+The project includes a text chunker in:
+
+`app/services/ingestion/chunker.py`
+
+It splits cleaned page text into ordered chunks while preserving:
+- page number
+- chunk index
+- character positions
+- overlap between chunks
+
+Current limitation:
+- Semantic chunking is not implemented yet.
+- Chunking is page-based for safety with large PDFs.
+
+## Metadata Builder
+
+The project includes a metadata builder in:
+
+`app/services/ingestion/metadata_builder.py`
+
+It converts `TextChunk` objects into flat chunk records ready for future embedding and ChromaDB storage.
+
+Each chunk record includes:
+- unique chunk ID
+- chunk text
+- document metadata
+- page number
+- chunk index
+- character positions
+
+Current limitation:
+- It does not store records in ChromaDB yet.
+- It does not generate document IDs automatically yet.
+
+## Ingestion Pipeline Preview
+
+The project can now run an in-memory ingestion preview:
+
+PDF extraction -> Arabic text cleaning -> chunking -> metadata records
+
+This prepares content for future embeddings and ChromaDB storage.
+
+Current limitation:
+- It does not store chunks in ChromaDB yet.
+- It does not generate embeddings yet.
+- It does not expose an API upload endpoint yet.
+
+## Embedding Client Foundation
+
+The project now includes an embedding abstraction in:
+
+`app/services/embeddings/`
+
+Current provider:
+- Ollama local embeddings using `/api/embed`
+
+Default model:
+- `nomic-embed-text`
+
+Future provider planned:
+- Google Gemini Embedding 2
+
+Current limitation:
+- Embeddings are not stored in ChromaDB yet.
+- Google embedding provider is not implemented yet.
 
 ## Run With Docker
 
@@ -87,6 +206,12 @@ uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
 docker compose up --build
 curl http://localhost:8001/health
 curl http://localhost:8001/health/dependencies
+pytest tests/test_pdf_extractor.py -v
+pytest tests/test_text_cleaner.py -v
+pytest tests/test_chunker.py -v
+pytest tests/test_metadata_builder.py -v
+pytest tests/test_ingestion_service.py -v
+pytest tests/test_embedding_service.py -v
 ```
 
 `/health` checks only the FastAPI app.
@@ -106,4 +231,4 @@ Expected `/health` response:
 
 ## Next Recommended Step
 
-Milestone 2A - PDF Extraction Foundation.
+Milestone 3B - ChromaDB Vector Store Foundation.

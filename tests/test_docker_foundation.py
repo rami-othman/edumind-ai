@@ -88,9 +88,25 @@ def test_env_files_use_expected_milestone_variables() -> None:
         "TOP_K": "5",
     }
 
+    embedding_expected = {
+        "EMBEDDING_PROVIDER": "ollama",
+        "EMBEDDING_DIMENSION": "768",
+        "GOOGLE_EMBEDDING_MODEL": "gemini-embedding-2",
+        "GOOGLE_EMBEDDING_DIMENSION": "768",
+    }
+
     for env_file in (".env", ".env.example"):
         values = parse_env(env_file)
-        assert values == expected
+        for key, expected_value in expected.items():
+            assert values[key] == expected_value
+
+        for key, expected_value in embedding_expected.items():
+            assert key in values
+            if env_file == ".env.example" and key == "EMBEDDING_DIMENSION":
+                assert values[key] in {"", expected_value}
+            else:
+                assert values[key] == expected_value
+
         assert "AI_SERVICE_HOST" not in values
         assert "AI_SERVICE_PORT" not in values
         assert "AI_SERVICE_ENV" not in values

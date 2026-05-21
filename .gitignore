@@ -28,7 +28,9 @@ Thumbs.db
 
 # Local data and uploads
 data/uploads/*
+data/uploads/**/*.pdf
 data/processed/*
+data/processed/**
 data/samples/*
 !data/uploads/.gitkeep
 !data/processed/.gitkeep
