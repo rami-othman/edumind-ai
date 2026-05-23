@@ -85,7 +85,7 @@ def test_env_example_contains_required_configuration() -> None:
         "OLLAMA_BASE_URL": "http://ollama:11434",
         "OLLAMA_LLM_BASE_URL": "https://ollama.com",
         "OLLAMA_EMBEDDING_BASE_URL": "http://ollama:11434",
-        "OLLAMA_LLM_MODEL": "deepseek-v4-pro:cloud",
+        "OLLAMA_LLM_MODEL": "gemma4:31b-cloud",
         "OLLAMA_EMBEDDING_MODEL": "nomic-embed-text",
         "EMBEDDING_PROVIDER": "ollama",
         "GOOGLE_EMBEDDING_MODEL": "gemini-embedding-2",

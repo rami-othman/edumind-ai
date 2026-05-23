@@ -50,6 +50,10 @@ def test_system_prompt_contains_arabic_tutor_and_source_grounding_rules() -> Non
     assert "مدرس عربي" in prompt.system_prompt
     assert "استخدم السياق المقدم فقط" in prompt.system_prompt
     assert "لا تخترع معلومات" in prompt.system_prompt
+    assert "الملف" in prompt.system_prompt
+    assert "الصفحة" in prompt.system_prompt
+    assert "المقطع" in prompt.system_prompt
+    assert "لا تخترع أرقام صفحات" in prompt.system_prompt
     assert "لا أملك معلومات كافية من المحتوى المتوفر للإجابة بدقة." in prompt.system_prompt
 
 
@@ -58,7 +62,10 @@ def test_user_prompt_contains_original_question_and_answer_rules() -> None:
     prompt = build_arabic_tutor_prompt(question, [_retrieved_chunk()])
 
     assert question in prompt.user_prompt
-    assert "اذكر المصادر في النهاية" in prompt.user_prompt
+    assert "المصادر:" in prompt.user_prompt
+    assert "- الملف:" in prompt.user_prompt
+    assert "الصفحة:" in prompt.user_prompt
+    assert "المقطع:" in prompt.user_prompt
     assert "لا تذكر صفحات أو مصادر غير موجودة" in prompt.user_prompt
 
 
@@ -67,12 +74,13 @@ def test_context_includes_available_source_metadata() -> None:
 
     assert "File: physics.pdf" in prompt.context
     assert "Page: 45" in prompt.context
+    assert "Chunk Index: 12" in prompt.context
     assert "Subject: physics" in prompt.context
     assert "Grade: 12" in prompt.context
     assert "Unit: electricity" in prompt.context
     assert "Lesson: ohms_law" in prompt.context
-    assert "Chunk Index: 12" in prompt.context
     assert "Chunk ID: physics_book_2026:chunk:12" in prompt.context
+    assert "Content:" in prompt.context
 
 
 def test_missing_metadata_does_not_crash() -> None:
@@ -83,10 +91,46 @@ def test_missing_metadata_does_not_crash() -> None:
 
     assert "Chunk ID: physics_book_2026:chunk:12" in prompt.context
     assert "Content:" in prompt.context
+    assert "Page:" not in prompt.context
+    assert "Chunk Index:" not in prompt.context
     assert prompt.sources == [
         {
             "chunk_id": "physics_book_2026:chunk:12",
             "distance": None,
+        },
+    ]
+
+
+def test_sources_include_available_flat_citation_metadata() -> None:
+    prompt = build_arabic_tutor_prompt(
+        "ما هو قانون أوم؟",
+        [
+            _retrieved_chunk(
+                metadata={
+                    "file_name": "physics.pdf",
+                    "page_number": 45,
+                    "subject": "physics",
+                    "grade": "12",
+                    "unit": "electricity",
+                    "lesson": "ohms_law",
+                    "chunk_index": 12,
+                    "nested": {"ignored": True},
+                },
+            ),
+        ],
+    )
+
+    assert prompt.sources == [
+        {
+            "chunk_id": "physics_book_2026:chunk:12",
+            "distance": 0.123,
+            "file_name": "physics.pdf",
+            "page_number": 45,
+            "subject": "physics",
+            "grade": "12",
+            "unit": "electricity",
+            "lesson": "ohms_law",
+            "chunk_index": 12,
         },
     ]
 

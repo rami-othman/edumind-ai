@@ -1,7 +1,15 @@
 # PROJECT_STATUS.md - EduMind AI Service
 
 ## Current Milestone
-Milestone 4D - Chat API Endpoint
+Milestone 4E - Real RAG Smoke Test Script
+
+## Current Status Updates
+
+### Improvement - Source Citation and Smoke Test Output Readability
+- Improved source citation prompt rules for file name, page number, chunk index, subject, and lesson.
+- Added concise smoke test output sections for ingestion, answer, sources, and retrieved chunk previews.
+- Added `--verbose` mode for full source JSON and retrieved chunk metadata.
+- Cleaned retrieved chunk previews by normalizing whitespace and truncating default previews.
 
 ## Implemented
 - FastAPI app initialization
@@ -89,6 +97,16 @@ Milestone 4D - Chat API Endpoint
 - RAG service dependency injection
 - Endpoint tests with mocked RAG service
 - Basic error handling
+- Manual smoke test script
+- Real PDF ingestion path
+- Real embedding call path
+- Real ChromaDB storage path
+- Real RAG answer path
+- CLI configuration overrides
+- Improved source citation prompt rules
+- Concise real RAG smoke test output
+- Real RAG smoke test verbose mode
+- Retrieved chunk preview cleanup
 - README update
 
 ## Not Implemented Yet
@@ -112,6 +130,8 @@ Milestone 4D - Chat API Endpoint
 - `app/schemas/chat_schema.py`
 - `app/dependencies.py`
 - `app/main.py`
+- `scripts/smoke_test_real_rag.py`
+- `docker-compose.yml`
 - `app/services/llm/ollama_client.py`
 - `app/services/ingestion/pdf_extractor.py`
 - `app/services/ingestion/text_cleaner.py`
@@ -169,6 +189,7 @@ pytest tests/test_prompt_builder.py -v
 pytest tests/test_llm_service.py -v
 pytest tests/test_rag_service.py -v
 pytest tests/test_chat_routes.py -v
+pytest tests/test_prompt_builder.py -v
 
 ## Known Issues
 - Ollama models are not auto-pulled yet.
@@ -180,6 +201,8 @@ pytest tests/test_chat_routes.py -v
 - Automatic real book ingestion is not implemented yet.
 - Authentication is not implemented yet.
 - Chat history is not implemented yet.
+- Production admin ingestion endpoint is not implemented yet.
+- Automatic large book ingestion is not implemented yet.
 - Real Ollama Cloud requires `OLLAMA_API_KEY` in local `.env`.
 - Vector store tests use mocks and do not require a real ChromaDB container.
 - Ingestion-to-vector-store tests use mocks and do not require real Ollama or ChromaDB.
@@ -187,11 +210,13 @@ pytest tests/test_chat_routes.py -v
 - Prompt builder tests are deterministic and do not call an LLM.
 - LLM and RAG service tests use mocks and do not call real Ollama or ChromaDB.
 - Chat endpoint tests use mocked RAG service.
+- Real RAG smoke test script is manual and is not part of pytest.
 - Google embedding provider is not implemented yet.
 
 ## Next Recommended Step
-Milestone 4E - Real RAG Smoke Test Script
-- Create a script to ingest a small PDF/sample into ChromaDB
-- Pull/check required Ollama models
-- Ask one real question through the internal RAG pipeline
-- Keep it separate from unit tests
+Milestone 5A - Admin PDF Ingestion API
+- Implement `POST /api/v1/ingest/pdf`
+- Accept PDF + metadata
+- Run ingestion to vector store
+- Return ingestion summary
+- Add endpoint tests with mocked services

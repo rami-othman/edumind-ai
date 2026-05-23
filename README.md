@@ -6,7 +6,7 @@ The service will support admin educational content ingestion, PDF text extractio
 
 ## Current Milestone
 
-Milestone 4D - Chat API Endpoint
+Milestone 4E - Real RAG Smoke Test Script
 
 ## Implemented
 
@@ -77,6 +77,12 @@ Milestone 4D - Chat API Endpoint
 - RAG service dependency injection for routes
 - Basic chat endpoint error handling
 - Chat endpoint tests with mocked RAG service
+- Manual real RAG smoke test script
+- Real PDF ingestion path for smoke testing
+- Real local Ollama embedding call path
+- Real ChromaDB storage path
+- Real RAG answer path through Ollama Cloud
+- Smoke test CLI configuration overrides
 
 ## Planned Architecture
 
@@ -109,7 +115,7 @@ docker/               Dockerfile and entrypoint placeholders
 
 The current system has no teacher role. Content is uploaded by admins only.
 
-This milestone intentionally does not include OCR, API upload logic, document ID generation strategy, Google embedding provider, authentication, chat history, exam generation, or answer evaluation.
+This milestone intentionally does not include OCR, API upload logic, production admin ingestion, automatic large book ingestion, Google embedding provider, authentication, chat history, exam generation, or answer evaluation.
 
 AI logic is not implemented yet. ChromaDB and Ollama run as containers, but models are not auto-pulled.
 
@@ -301,6 +307,51 @@ curl -X POST http://localhost:8001/api/v1/chat/ask \
   -d "{\"question\":\"ما هو قانون أوم؟\",\"top_k\":5,\"filters\":{\"subject\":\"physics\"}}"
 ```
 
+## Real RAG Smoke Test
+
+A manual smoke test script is available at:
+
+`scripts/smoke_test_real_rag.py`
+
+It runs:
+
+PDF -> extraction -> cleaning -> chunking -> metadata -> embeddings -> ChromaDB -> retrieval -> LLM answer
+
+This script uses real services and should not be run as part of unit tests.
+
+Default output is concise: ingestion summary, answer, compact source lines, and short retrieved chunk previews.
+Use `--verbose` to print full source JSON and full retrieved chunk metadata.
+
+Docker mode:
+
+```bash
+docker compose up -d --build
+docker compose exec ollama ollama pull nomic-embed-text
+docker compose exec ai-service python scripts/smoke_test_real_rag.py --pdf /app/data/fake_pdfs/ohms_law_arabic.pdf
+```
+
+Verbose:
+
+```bash
+docker compose exec ai-service python scripts/smoke_test_real_rag.py --pdf /app/data/fake_pdfs/ohms_law_arabic.pdf --verbose
+```
+
+Host mode:
+
+```bash
+python scripts/smoke_test_real_rag.py \
+  --pdf data/fake_pdfs/ohms_law_arabic.pdf \
+  --chroma-host localhost \
+  --embedding-base-url http://localhost:11434 \
+  --llm-base-url https://ollama.com
+```
+
+Requirements:
+- ChromaDB container running
+- Ollama container running
+- `nomic-embed-text` pulled in Ollama
+- `OLLAMA_API_KEY` set in local `.env` for Ollama Cloud
+
 ## Run With Docker
 
 ```bash
@@ -365,4 +416,4 @@ Expected `/health` response:
 
 ## Next Recommended Step
 
-Milestone 4E - Real RAG Smoke Test Script.
+Milestone 5A - Admin PDF Ingestion API.

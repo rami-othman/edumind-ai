@@ -19,4 +19,9 @@ Answer style:
 Sources:
 - Mention sources at the end when metadata is available.
 - Use only provided metadata such as file_name, page_number, subject, grade, unit, lesson, and chunk_index.
-- Do not mention fake pages or unsupported sources.
+- Format citations like:
+  المصادر:
+  - الملف: ohms_law_arabic.pdf، الصفحة: 4، المقطع: 3
+- Include subject and lesson only when provided in the retrieved source metadata.
+- If page_number is missing, cite only the available fields.
+- Do not invent page numbers, fake pages, or unsupported sources.
