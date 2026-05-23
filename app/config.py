@@ -20,9 +20,13 @@ class Settings(BaseSettings):
     chroma_distance_function: str = "cosine"
 
     ollama_base_url: str = "http://ollama:11434"
-    ollama_llm_model: str = "gemma3:12b"
+    ollama_llm_base_url: str | None = "https://ollama.com"
+    ollama_embedding_base_url: str | None = "http://ollama:11434"
+    ollama_api_key: str | None = None
+    ollama_llm_model: str = "deepseek-v4-pro:cloud"
     ollama_embedding_model: str = "nomic-embed-text"
 
+    llm_provider: str = "ollama"
     embedding_provider: str = "ollama"
     embedding_dimension: int | None = None
     google_embedding_model: str = "gemini-embedding-2"
@@ -38,6 +42,18 @@ class Settings(BaseSettings):
     @field_validator("embedding_dimension", mode="before")
     @classmethod
     def parse_optional_embedding_dimension(cls, value: object) -> object:
+        if value == "":
+            return None
+        return value
+
+    @field_validator(
+        "ollama_llm_base_url",
+        "ollama_embedding_base_url",
+        "ollama_api_key",
+        mode="before",
+    )
+    @classmethod
+    def parse_optional_text(cls, value: object) -> object:
         if value == "":
             return None
         return value

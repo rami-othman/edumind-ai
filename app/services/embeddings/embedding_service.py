@@ -17,7 +17,8 @@ def get_embedding_client(settings: Settings | None = None) -> OllamaEmbeddingCli
 
     if provider == "ollama":
         return OllamaEmbeddingClient(
-            base_url=active_settings.ollama_base_url,
+            base_url=getattr(active_settings, "ollama_embedding_base_url", None)
+            or active_settings.ollama_base_url,
             model=active_settings.ollama_embedding_model,
         )
 

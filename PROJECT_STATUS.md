@@ -1,7 +1,7 @@
 # PROJECT_STATUS.md - EduMind AI Service
 
 ## Current Milestone
-Milestone 4B - RAG Prompt Builder
+Milestone 4C - RAG Service Orchestration
 
 ## Implemented
 - FastAPI app initialization
@@ -78,6 +78,12 @@ Milestone 4B - RAG Prompt Builder
 - Source metadata extraction
 - Fallback/no-context behavior
 - Prompt builder tests
+- Ollama chat client foundation
+- LLM service abstraction
+- RAG answer result model
+- Retriever to prompt builder to LLM orchestration
+- RAG source preservation
+- Mocked LLM and RAG orchestration tests
 - README update
 
 ## Not Implemented Yet
@@ -86,11 +92,10 @@ Milestone 4B - RAG Prompt Builder
 - Automatic real book ingestion
 - Document ID generation strategy
 - Google embedding provider
-- RAG orchestration
 - Chat endpoint logic
-- LLM answer generation
 - Ollama generation
-- RAG
+- Real frontend/backend integration
+- Advanced conversation memory
 - Exam generation
 - Answer evaluation
 
@@ -108,8 +113,12 @@ Milestone 4B - RAG Prompt Builder
 - `app/services/vector_store/vector_store_service.py`
 - `app/services/rag/retriever.py`
 - `app/services/rag/prompt_builder.py`
+- `app/services/rag/rag_service.py`
+- `app/services/llm/llm_service.py`
 - `app/prompts/arabic_tutor_prompt.txt`
 - `app/config.py`
+- `tests/test_llm_service.py`
+- `tests/test_rag_service.py`
 - `tests/test_dependency_health.py`
 - `tests/test_pdf_extractor.py`
 - `tests/test_text_cleaner.py`
@@ -145,6 +154,8 @@ pytest tests/test_embedding_service.py -v
 pytest tests/test_vector_store_service.py -v
 pytest tests/test_retriever.py -v
 pytest tests/test_prompt_builder.py -v
+pytest tests/test_llm_service.py -v
+pytest tests/test_rag_service.py -v
 
 ## Known Issues
 - Ollama models are not auto-pulled yet.
@@ -154,17 +165,18 @@ pytest tests/test_prompt_builder.py -v
 - Document IDs are not generated automatically yet.
 - Ingestion-to-vector-store orchestration is not exposed through an API endpoint yet.
 - Automatic real book ingestion is not implemented yet.
-- RAG answer generation is not implemented yet.
-- RAG service orchestration is not implemented yet.
 - Chat endpoint is not connected yet.
+- Real Ollama Cloud requires `OLLAMA_API_KEY` in local `.env`.
 - Vector store tests use mocks and do not require a real ChromaDB container.
 - Ingestion-to-vector-store tests use mocks and do not require real Ollama or ChromaDB.
 - Retriever tests use mocks and do not require real Ollama or ChromaDB.
 - Prompt builder tests are deterministic and do not call an LLM.
+- LLM and RAG service tests use mocks and do not call real Ollama or ChromaDB.
 - Google embedding provider is not implemented yet.
 
 ## Next Recommended Step
-Milestone 4C - RAG Service Orchestration
-- Connect retriever -> prompt builder -> LLM service
+Milestone 4D - Chat API Endpoint
+- Implement `/api/v1/chat/ask`
+- Wire request schema to RAG service
 - Return answer + sources
-- Add mocked tests
+- Add endpoint tests with mocked RAG service

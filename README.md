@@ -6,7 +6,7 @@ The service will support admin educational content ingestion, PDF text extractio
 
 ## Current Milestone
 
-Milestone 4B - RAG Prompt Builder
+Milestone 4C - RAG Service Orchestration
 
 ## Implemented
 
@@ -66,6 +66,12 @@ Milestone 4B - RAG Prompt Builder
 - Source metadata extraction
 - Fallback/no-context prompt behavior
 - Prompt builder tests
+- Ollama chat client foundation
+- LLM service abstraction
+- RAG answer result model
+- Retriever to prompt builder to LLM orchestration
+- RAG source preservation
+- Mocked LLM and RAG orchestration tests
 
 ## Planned Architecture
 
@@ -98,7 +104,7 @@ docker/               Dockerfile and entrypoint placeholders
 
 The current system has no teacher role. Content is uploaded by admins only.
 
-This milestone intentionally does not include OCR, API upload logic, document ID generation strategy, Google embedding provider, LLM answer generation, RAG orchestration, chat endpoint logic, exam generation, or answer evaluation.
+This milestone intentionally does not include OCR, API upload logic, document ID generation strategy, Google embedding provider, chat endpoint logic, exam generation, or answer evaluation.
 
 AI logic is not implemented yet. ChromaDB and Ollama run as containers, but models are not auto-pulled.
 
@@ -251,6 +257,21 @@ Current limitation:
 - It does not generate final answers yet.
 - It is not connected to the chat API yet.
 
+## RAG Service Orchestration
+
+The project now connects:
+
+retriever -> prompt builder -> LLM service
+
+The current LLM provider is Ollama. The project can use local Ollama models or Ollama Cloud models such as:
+
+`deepseek-v4-pro:cloud`
+
+Current limitation:
+- The chat API endpoint is not implemented yet.
+- Unit tests mock LLM calls.
+- Real Ollama Cloud requires `OLLAMA_API_KEY` in `.env`.
+
 ## Run With Docker
 
 ```bash
@@ -292,6 +313,9 @@ pytest tests/test_vector_store_service.py -v
 pytest tests/test_ingestion_to_vector_store.py -v
 pytest tests/test_retriever.py -v
 pytest tests/test_prompt_builder.py -v
+pytest tests/test_llm_service.py -v
+pytest tests/test_rag_service.py -v
+pytest -v
 ```
 
 `/health` checks only the FastAPI app.
@@ -311,4 +335,4 @@ Expected `/health` response:
 
 ## Next Recommended Step
 
-Milestone 4C - RAG Service Orchestration.
+Milestone 4D - Chat API Endpoint.
