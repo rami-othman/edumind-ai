@@ -1,7 +1,7 @@
 # PROJECT_STATUS.md - EduMind AI Service
 
 ## Current Milestone
-Milestone 4A - Retriever Foundation
+Milestone 4B - RAG Prompt Builder
 
 ## Implemented
 - FastAPI app initialization
@@ -73,6 +73,11 @@ Milestone 4A - Retriever Foundation
 - Retrieval top_k support
 - Retrieval where-filter pass-through
 - Mocked retriever tests
+- Arabic tutor prompt builder
+- Retrieved context formatting
+- Source metadata extraction
+- Fallback/no-context behavior
+- Prompt builder tests
 - README update
 
 ## Not Implemented Yet
@@ -81,8 +86,7 @@ Milestone 4A - Retriever Foundation
 - Automatic real book ingestion
 - Document ID generation strategy
 - Google embedding provider
-- Prompt builder
-- RAG prompt building
+- RAG orchestration
 - Chat endpoint logic
 - LLM answer generation
 - Ollama generation
@@ -103,6 +107,8 @@ Milestone 4A - Retriever Foundation
 - `app/services/vector_store/chroma_client.py`
 - `app/services/vector_store/vector_store_service.py`
 - `app/services/rag/retriever.py`
+- `app/services/rag/prompt_builder.py`
+- `app/prompts/arabic_tutor_prompt.txt`
 - `app/config.py`
 - `tests/test_dependency_health.py`
 - `tests/test_pdf_extractor.py`
@@ -114,6 +120,7 @@ Milestone 4A - Retriever Foundation
 - `tests/test_embedding_service.py`
 - `tests/test_vector_store_service.py`
 - `tests/test_retriever.py`
+- `tests/test_prompt_builder.py`
 - `README.md`
 - `PROJECT_STATUS.md`
 - `.env.example`
@@ -137,6 +144,7 @@ pytest tests/test_ingestion_to_vector_store.py -v
 pytest tests/test_embedding_service.py -v
 pytest tests/test_vector_store_service.py -v
 pytest tests/test_retriever.py -v
+pytest tests/test_prompt_builder.py -v
 
 ## Known Issues
 - Ollama models are not auto-pulled yet.
@@ -147,16 +155,16 @@ pytest tests/test_retriever.py -v
 - Ingestion-to-vector-store orchestration is not exposed through an API endpoint yet.
 - Automatic real book ingestion is not implemented yet.
 - RAG answer generation is not implemented yet.
-- Prompt builder is not implemented yet.
+- RAG service orchestration is not implemented yet.
 - Chat endpoint is not connected yet.
 - Vector store tests use mocks and do not require a real ChromaDB container.
 - Ingestion-to-vector-store tests use mocks and do not require real Ollama or ChromaDB.
 - Retriever tests use mocks and do not require real Ollama or ChromaDB.
+- Prompt builder tests are deterministic and do not call an LLM.
 - Google embedding provider is not implemented yet.
 
 ## Next Recommended Step
-Milestone 4B - RAG Prompt Builder
-- Implement `prompt_builder.py`
-- Build Arabic tutor prompt using retrieved chunks
-- Enforce source-grounded answer rules
-- Add tests for prompt content and fallback behavior
+Milestone 4C - RAG Service Orchestration
+- Connect retriever -> prompt builder -> LLM service
+- Return answer + sources
+- Add mocked tests

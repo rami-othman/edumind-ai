@@ -6,7 +6,7 @@ The service will support admin educational content ingestion, PDF text extractio
 
 ## Current Milestone
 
-Milestone 4A - Retriever Foundation
+Milestone 4B - RAG Prompt Builder
 
 ## Implemented
 
@@ -61,6 +61,11 @@ Milestone 4A - Retriever Foundation
 - Retrieval `top_k` support
 - Retrieval `where` filter pass-through
 - Mocked retriever tests
+- Arabic tutor prompt builder
+- Retrieved context formatting
+- Source metadata extraction
+- Fallback/no-context prompt behavior
+- Prompt builder tests
 
 ## Planned Architecture
 
@@ -93,7 +98,7 @@ docker/               Dockerfile and entrypoint placeholders
 
 The current system has no teacher role. Content is uploaded by admins only.
 
-This milestone intentionally does not include OCR, API upload logic, document ID generation strategy, Google embedding provider, RAG answer generation, prompt building, chat endpoint logic, exam generation, or answer evaluation.
+This milestone intentionally does not include OCR, API upload logic, document ID generation strategy, Google embedding provider, LLM answer generation, RAG orchestration, chat endpoint logic, exam generation, or answer evaluation.
 
 AI logic is not implemented yet. ChromaDB and Ollama run as containers, but models are not auto-pulled.
 
@@ -231,7 +236,19 @@ It embeds a user question, queries similar chunks from the vector store, and ret
 
 Current limitation:
 - It does not generate final AI answers yet.
-- It does not build RAG prompts yet.
+- It is not connected to the chat API yet.
+
+## RAG Prompt Builder
+
+The project now includes a prompt builder in:
+
+`app/services/rag/prompt_builder.py`
+
+It builds Arabic, source-grounded tutor prompts from retrieved chunks.
+
+Current limitation:
+- It does not call the LLM yet.
+- It does not generate final answers yet.
 - It is not connected to the chat API yet.
 
 ## Run With Docker
@@ -274,6 +291,7 @@ pytest tests/test_embedding_service.py -v
 pytest tests/test_vector_store_service.py -v
 pytest tests/test_ingestion_to_vector_store.py -v
 pytest tests/test_retriever.py -v
+pytest tests/test_prompt_builder.py -v
 ```
 
 `/health` checks only the FastAPI app.
@@ -293,4 +311,4 @@ Expected `/health` response:
 
 ## Next Recommended Step
 
-Milestone 4B - RAG Prompt Builder.
+Milestone 4C - RAG Service Orchestration.
