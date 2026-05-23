@@ -6,7 +6,7 @@ The service will support admin educational content ingestion, PDF text extractio
 
 ## Current Milestone
 
-Milestone 4C - RAG Service Orchestration
+Milestone 4D - Chat API Endpoint
 
 ## Implemented
 
@@ -72,6 +72,11 @@ Milestone 4C - RAG Service Orchestration
 - Retriever to prompt builder to LLM orchestration
 - RAG source preservation
 - Mocked LLM and RAG orchestration tests
+- `/api/v1/chat/ask` endpoint
+- Chat request and response schemas
+- RAG service dependency injection for routes
+- Basic chat endpoint error handling
+- Chat endpoint tests with mocked RAG service
 
 ## Planned Architecture
 
@@ -104,7 +109,7 @@ docker/               Dockerfile and entrypoint placeholders
 
 The current system has no teacher role. Content is uploaded by admins only.
 
-This milestone intentionally does not include OCR, API upload logic, document ID generation strategy, Google embedding provider, chat endpoint logic, exam generation, or answer evaluation.
+This milestone intentionally does not include OCR, API upload logic, document ID generation strategy, Google embedding provider, authentication, chat history, exam generation, or answer evaluation.
 
 AI logic is not implemented yet. ChromaDB and Ollama run as containers, but models are not auto-pulled.
 
@@ -272,6 +277,30 @@ Current limitation:
 - Unit tests mock LLM calls.
 - Real Ollama Cloud requires `OLLAMA_API_KEY` in `.env`.
 
+## Chat API Endpoint
+
+The project now exposes:
+
+`POST /api/v1/chat/ask`
+
+This endpoint calls the internal RAG service and returns:
+- answer
+- sources
+- retrieved chunks
+
+Current limitation:
+- No authentication yet.
+- No chat history yet.
+- Tests use mocked RAG service.
+
+Example request:
+
+```bash
+curl -X POST http://localhost:8001/api/v1/chat/ask \
+  -H "Content-Type: application/json" \
+  -d "{\"question\":\"ما هو قانون أوم؟\",\"top_k\":5,\"filters\":{\"subject\":\"physics\"}}"
+```
+
 ## Run With Docker
 
 ```bash
@@ -315,6 +344,7 @@ pytest tests/test_retriever.py -v
 pytest tests/test_prompt_builder.py -v
 pytest tests/test_llm_service.py -v
 pytest tests/test_rag_service.py -v
+pytest tests/test_chat_routes.py -v
 pytest -v
 ```
 
@@ -335,4 +365,4 @@ Expected `/health` response:
 
 ## Next Recommended Step
 
-Milestone 4D - Chat API Endpoint.
+Milestone 4E - Real RAG Smoke Test Script.
