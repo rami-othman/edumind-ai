@@ -1,7 +1,7 @@
 # PROJECT_STATUS.md - EduMind AI Service
 
 ## Current Milestone
-Milestone 3A - Embedding Client Foundation
+Milestone 3C - Ingestion to Vector Store Integration
 
 ## Implemented
 - FastAPI app initialization
@@ -53,15 +53,31 @@ Milestone 3A - Embedding Client Foundation
 - Embedding service abstraction
 - Mocked embedding tests
 - Future Google embedding placeholder configuration
+- ChromaDB client wrapper
+- Collection get/create support
+- Configurable ChromaDB distance function
+- Vector store add records support
+- Vector similarity query helper
+- Vector store input validation
+- Mocked vector store tests
+- Ingestion preview to vector store orchestration
+- Chunk text embedding step
+- Chunk record storage step
+- Ingestion storage result model
+- Zero-chunk handling
+- Mocked ingestion-to-vector-store tests
 - README update
 
 ## Not Implemented Yet
 - OCR
-- API upload endpoint
+- Real admin upload endpoint
+- Automatic real book ingestion
 - Document ID generation strategy
 - Google embedding provider
-- ChromaDB document storage/search
-- Vector search
+- Retriever service
+- RAG prompt building
+- Chat endpoint logic
+- LLM answer generation
 - Ollama generation
 - RAG
 - Exam generation
@@ -69,7 +85,6 @@ Milestone 3A - Embedding Client Foundation
 
 ## Modified Files
 - `app/api/health_routes.py`
-- `app/services/vector_store/chroma_client.py`
 - `app/services/llm/ollama_client.py`
 - `app/services/ingestion/pdf_extractor.py`
 - `app/services/ingestion/text_cleaner.py`
@@ -78,6 +93,8 @@ Milestone 3A - Embedding Client Foundation
 - `app/services/ingestion/ingestion_service.py`
 - `app/services/embeddings/embedding_client.py`
 - `app/services/embeddings/embedding_service.py`
+- `app/services/vector_store/chroma_client.py`
+- `app/services/vector_store/vector_store_service.py`
 - `app/config.py`
 - `tests/test_dependency_health.py`
 - `tests/test_pdf_extractor.py`
@@ -85,7 +102,9 @@ Milestone 3A - Embedding Client Foundation
 - `tests/test_chunker.py`
 - `tests/test_metadata_builder.py`
 - `tests/test_ingestion_service.py`
+- `tests/test_ingestion_to_vector_store.py`
 - `tests/test_embedding_service.py`
+- `tests/test_vector_store_service.py`
 - `README.md`
 - `PROJECT_STATUS.md`
 - `.env.example`
@@ -105,7 +124,9 @@ pytest tests/test_text_cleaner.py -v
 pytest tests/test_chunker.py -v
 pytest tests/test_metadata_builder.py -v
 pytest tests/test_ingestion_service.py -v
+pytest tests/test_ingestion_to_vector_store.py -v
 pytest tests/test_embedding_service.py -v
+pytest tests/test_vector_store_service.py -v
 
 ## Known Issues
 - Ollama models are not auto-pulled yet.
@@ -113,13 +134,16 @@ pytest tests/test_embedding_service.py -v
 - OCR is not implemented yet; scanned/image-only PDFs may return empty page text.
 - Semantic chunking is not implemented yet.
 - Document IDs are not generated automatically yet.
-- Ingestion preview does not store records or generate embeddings yet.
-- Embeddings are not stored in ChromaDB yet.
+- Ingestion-to-vector-store orchestration is not exposed through an API endpoint yet.
+- Automatic real book ingestion is not implemented yet.
+- RAG is not implemented yet.
+- Vector store tests use mocks and do not require a real ChromaDB container.
+- Ingestion-to-vector-store tests use mocks and do not require real Ollama or ChromaDB.
 - Google embedding provider is not implemented yet.
 
 ## Next Recommended Step
-Milestone 3B - ChromaDB Vector Store Foundation
-- Implement ChromaDB client/service
-- Create/get collection
-- Store chunk records with embeddings
-- Add mocked/unit tests where possible
+Milestone 4A - Retriever Foundation
+- Use embedding service to embed a user query
+- Query similar chunks from ChromaDB
+- Return normalized source chunks
+- Add tests with mocks

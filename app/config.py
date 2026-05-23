@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     chroma_host: str = "chroma"
     chroma_port: int = 8000
     chroma_collection_name: str = "edumind_content"
+    chroma_distance_function: str = "cosine"
 
     ollama_base_url: str = "http://ollama:11434"
     ollama_llm_model: str = "gemma3:12b"

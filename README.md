@@ -6,7 +6,7 @@ The service will support admin educational content ingestion, PDF text extractio
 
 ## Current Milestone
 
-Milestone 3A - Embedding Client Foundation
+Milestone 3C - Ingestion to Vector Store Integration
 
 ## Implemented
 
@@ -43,6 +43,17 @@ Milestone 3A - Embedding Client Foundation
 - Embedding service abstraction
 - Mocked embedding service tests
 - Future Google embedding placeholder configuration
+- ChromaDB client wrapper
+- Collection get/create support with configurable distance function
+- Vector store support for storing chunk records with precomputed embeddings
+- Similar chunk query helper
+- Mocked vector store service tests
+- Ingestion preview to vector store orchestration
+- Chunk text embedding step
+- Chunk record storage step
+- Ingestion storage result model
+- Zero-chunk ingestion storage handling
+- Mocked ingestion-to-vector-store tests
 
 ## Planned Architecture
 
@@ -75,7 +86,7 @@ docker/               Dockerfile and entrypoint placeholders
 
 The current system has no teacher role. Content is uploaded by admins only.
 
-This milestone intentionally does not include OCR, API upload logic, document ID generation strategy, Google embedding provider, ChromaDB document storage/search, vector search, RAG behavior, citations, exam generation, or answer evaluation.
+This milestone intentionally does not include OCR, API upload logic, document ID generation strategy, Google embedding provider, RAG behavior, citations, chat endpoint logic, exam generation, or answer evaluation.
 
 AI logic is not implemented yet. ChromaDB and Ollama run as containers, but models are not auto-pulled.
 
@@ -172,8 +183,36 @@ Future provider planned:
 - Google Gemini Embedding 2
 
 Current limitation:
-- Embeddings are not stored in ChromaDB yet.
 - Google embedding provider is not implemented yet.
+
+## ChromaDB Vector Store Foundation
+
+The project now includes a vector store foundation in:
+
+`app/services/vector_store/`
+
+It supports:
+- creating/getting a ChromaDB collection
+- storing chunk records with precomputed embeddings
+- querying similar chunks by query embedding
+
+Current limitation:
+- The storage orchestration is not exposed through an API endpoint yet.
+- RAG is not implemented yet.
+- Tests use mocks and do not require a real ChromaDB container.
+
+## Ingestion to Vector Store Integration
+
+The project can now connect:
+
+PDF extraction -> cleaning -> chunking -> metadata -> embeddings -> ChromaDB vector store
+
+This stores chunk records with precomputed embeddings.
+
+Current limitation:
+- RAG retrieval is not implemented yet.
+- Chat endpoint is not connected yet.
+- Tests use fakes/mocks and do not require real Ollama or ChromaDB.
 
 ## Run With Docker
 
@@ -212,6 +251,8 @@ pytest tests/test_chunker.py -v
 pytest tests/test_metadata_builder.py -v
 pytest tests/test_ingestion_service.py -v
 pytest tests/test_embedding_service.py -v
+pytest tests/test_vector_store_service.py -v
+pytest tests/test_ingestion_to_vector_store.py -v
 ```
 
 `/health` checks only the FastAPI app.
@@ -231,4 +272,4 @@ Expected `/health` response:
 
 ## Next Recommended Step
 
-Milestone 3B - ChromaDB Vector Store Foundation.
+Milestone 4A - Retriever Foundation.
