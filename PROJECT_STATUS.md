@@ -1,7 +1,7 @@
 # PROJECT_STATUS.md - EduMind AI Service
 
 ## Current Milestone
-Milestone 3C - Ingestion to Vector Store Integration
+Milestone 4A - Retriever Foundation
 
 ## Implemented
 - FastAPI app initialization
@@ -66,6 +66,13 @@ Milestone 3C - Ingestion to Vector Store Integration
 - Ingestion storage result model
 - Zero-chunk handling
 - Mocked ingestion-to-vector-store tests
+- Query embedding flow
+- Vector store similarity query flow
+- Retrieved chunk model
+- Retrieval metadata preservation
+- Retrieval top_k support
+- Retrieval where-filter pass-through
+- Mocked retriever tests
 - README update
 
 ## Not Implemented Yet
@@ -74,7 +81,7 @@ Milestone 3C - Ingestion to Vector Store Integration
 - Automatic real book ingestion
 - Document ID generation strategy
 - Google embedding provider
-- Retriever service
+- Prompt builder
 - RAG prompt building
 - Chat endpoint logic
 - LLM answer generation
@@ -95,6 +102,7 @@ Milestone 3C - Ingestion to Vector Store Integration
 - `app/services/embeddings/embedding_service.py`
 - `app/services/vector_store/chroma_client.py`
 - `app/services/vector_store/vector_store_service.py`
+- `app/services/rag/retriever.py`
 - `app/config.py`
 - `tests/test_dependency_health.py`
 - `tests/test_pdf_extractor.py`
@@ -105,6 +113,7 @@ Milestone 3C - Ingestion to Vector Store Integration
 - `tests/test_ingestion_to_vector_store.py`
 - `tests/test_embedding_service.py`
 - `tests/test_vector_store_service.py`
+- `tests/test_retriever.py`
 - `README.md`
 - `PROJECT_STATUS.md`
 - `.env.example`
@@ -127,6 +136,7 @@ pytest tests/test_ingestion_service.py -v
 pytest tests/test_ingestion_to_vector_store.py -v
 pytest tests/test_embedding_service.py -v
 pytest tests/test_vector_store_service.py -v
+pytest tests/test_retriever.py -v
 
 ## Known Issues
 - Ollama models are not auto-pulled yet.
@@ -136,14 +146,17 @@ pytest tests/test_vector_store_service.py -v
 - Document IDs are not generated automatically yet.
 - Ingestion-to-vector-store orchestration is not exposed through an API endpoint yet.
 - Automatic real book ingestion is not implemented yet.
-- RAG is not implemented yet.
+- RAG answer generation is not implemented yet.
+- Prompt builder is not implemented yet.
+- Chat endpoint is not connected yet.
 - Vector store tests use mocks and do not require a real ChromaDB container.
 - Ingestion-to-vector-store tests use mocks and do not require real Ollama or ChromaDB.
+- Retriever tests use mocks and do not require real Ollama or ChromaDB.
 - Google embedding provider is not implemented yet.
 
 ## Next Recommended Step
-Milestone 4A - Retriever Foundation
-- Use embedding service to embed a user query
-- Query similar chunks from ChromaDB
-- Return normalized source chunks
-- Add tests with mocks
+Milestone 4B - RAG Prompt Builder
+- Implement `prompt_builder.py`
+- Build Arabic tutor prompt using retrieved chunks
+- Enforce source-grounded answer rules
+- Add tests for prompt content and fallback behavior

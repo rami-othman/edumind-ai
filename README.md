@@ -6,7 +6,7 @@ The service will support admin educational content ingestion, PDF text extractio
 
 ## Current Milestone
 
-Milestone 3C - Ingestion to Vector Store Integration
+Milestone 4A - Retriever Foundation
 
 ## Implemented
 
@@ -54,6 +54,13 @@ Milestone 3C - Ingestion to Vector Store Integration
 - Ingestion storage result model
 - Zero-chunk ingestion storage handling
 - Mocked ingestion-to-vector-store tests
+- Retriever service for source chunk lookup
+- Retrieved chunk model
+- Query embedding flow
+- Vector store similarity query flow
+- Retrieval `top_k` support
+- Retrieval `where` filter pass-through
+- Mocked retriever tests
 
 ## Planned Architecture
 
@@ -86,7 +93,7 @@ docker/               Dockerfile and entrypoint placeholders
 
 The current system has no teacher role. Content is uploaded by admins only.
 
-This milestone intentionally does not include OCR, API upload logic, document ID generation strategy, Google embedding provider, RAG behavior, citations, chat endpoint logic, exam generation, or answer evaluation.
+This milestone intentionally does not include OCR, API upload logic, document ID generation strategy, Google embedding provider, RAG answer generation, prompt building, chat endpoint logic, exam generation, or answer evaluation.
 
 AI logic is not implemented yet. ChromaDB and Ollama run as containers, but models are not auto-pulled.
 
@@ -210,9 +217,22 @@ PDF extraction -> cleaning -> chunking -> metadata -> embeddings -> ChromaDB vec
 This stores chunk records with precomputed embeddings.
 
 Current limitation:
-- RAG retrieval is not implemented yet.
+- RAG answer generation is not implemented yet.
 - Chat endpoint is not connected yet.
 - Tests use fakes/mocks and do not require real Ollama or ChromaDB.
+
+## Retriever Foundation
+
+The project now includes a retriever in:
+
+`app/services/rag/retriever.py`
+
+It embeds a user question, queries similar chunks from the vector store, and returns normalized retrieved source chunks.
+
+Current limitation:
+- It does not generate final AI answers yet.
+- It does not build RAG prompts yet.
+- It is not connected to the chat API yet.
 
 ## Run With Docker
 
@@ -253,6 +273,7 @@ pytest tests/test_ingestion_service.py -v
 pytest tests/test_embedding_service.py -v
 pytest tests/test_vector_store_service.py -v
 pytest tests/test_ingestion_to_vector_store.py -v
+pytest tests/test_retriever.py -v
 ```
 
 `/health` checks only the FastAPI app.
@@ -272,4 +293,4 @@ Expected `/health` response:
 
 ## Next Recommended Step
 
-Milestone 4A - Retriever Foundation.
+Milestone 4B - RAG Prompt Builder.
