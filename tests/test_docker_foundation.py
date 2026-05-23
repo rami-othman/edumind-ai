@@ -69,8 +69,10 @@ def test_compose_defines_required_services_and_volumes() -> None:
     assert set(compose["volumes"]) == {"chroma_data", "ollama_data"}
 
 
-def test_env_files_use_expected_milestone_variables() -> None:
-    expected = {
+def test_env_example_contains_required_configuration() -> None:
+    values = parse_env(".env.example")
+
+    expected_public_values = {
         "APP_NAME": "EduMind AI Service",
         "APP_ENV": "development",
         "APP_HOST": "0.0.0.0",
@@ -78,9 +80,13 @@ def test_env_files_use_expected_milestone_variables() -> None:
         "CHROMA_HOST": "chroma",
         "CHROMA_PORT": "8000",
         "CHROMA_COLLECTION_NAME": "edumind_content",
+        "CHROMA_DISTANCE_FUNCTION": "cosine",
         "OLLAMA_BASE_URL": "http://ollama:11434",
-        "OLLAMA_LLM_MODEL": "gemma3:12b",
+        "OLLAMA_LLM_MODEL": "deepseek-v4-pro:cloud",
         "OLLAMA_EMBEDDING_MODEL": "nomic-embed-text",
+        "EMBEDDING_PROVIDER": "ollama",
+        "GOOGLE_EMBEDDING_MODEL": "gemini-embedding-2",
+        "GOOGLE_EMBEDDING_DIMENSION": "768",
         "UPLOAD_DIR": "/app/data/uploads",
         "PROCESSED_DIR": "/app/data/processed",
         "CHUNK_SIZE": "800",
@@ -88,25 +94,20 @@ def test_env_files_use_expected_milestone_variables() -> None:
         "TOP_K": "5",
     }
 
-    embedding_expected = {
-        "EMBEDDING_PROVIDER": "ollama",
-        "EMBEDDING_DIMENSION": "768",
-        "GOOGLE_EMBEDDING_MODEL": "gemini-embedding-2",
-        "GOOGLE_EMBEDDING_DIMENSION": "768",
+    for key, expected_value in expected_public_values.items():
+        assert values.get(key) == expected_value
+
+    assert values.get("EMBEDDING_DIMENSION") in {"", "768"}
+
+    assert "OLLAMA_API_KEY" in values
+    assert values["OLLAMA_API_KEY"] in {
+        "",
+        "your_ollama_api_key_here",
+        "your_real_ollama_api_key_here",
     }
 
-    for env_file in (".env", ".env.example"):
-        values = parse_env(env_file)
-        for key, expected_value in expected.items():
-            assert values[key] == expected_value
-
-        for key, expected_value in embedding_expected.items():
-            assert key in values
-            if env_file == ".env.example" and key == "EMBEDDING_DIMENSION":
-                assert values[key] in {"", expected_value}
-            else:
-                assert values[key] == expected_value
-
-        assert "AI_SERVICE_HOST" not in values
-        assert "AI_SERVICE_PORT" not in values
-        assert "AI_SERVICE_ENV" not in values
+    # .env is intentionally not tested here because it is local, ignored by Git,
+    # and may contain real secrets or developer-specific overrides.
+    assert "AI_SERVICE_HOST" not in values
+    assert "AI_SERVICE_PORT" not in values
+    assert "AI_SERVICE_ENV" not in values
