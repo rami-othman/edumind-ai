@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import re
 
+from app.utils.arabic_text_utils import normalize_arabic_text
+
 
 _REPEATED_SPACES_PATTERN = re.compile(r"[ ]+")
 _REPEATED_EMPTY_LINES_PATTERN = re.compile(r"\n{3,}")
@@ -45,6 +47,7 @@ def clean_extracted_text(text: str) -> str:
     cleaned = normalize_whitespace(text)
     cleaned = normalize_arabic_punctuation_spacing(cleaned)
     cleaned = remove_repeated_empty_lines(cleaned)
+    cleaned = normalize_arabic_text(cleaned)
     return cleaned.strip()
 
 

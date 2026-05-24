@@ -5,6 +5,14 @@ Milestone 5A - Admin PDF Ingestion API
 
 ## Current Status Updates
 
+### Improvement - Arabic Hybrid Retrieval
+- Added conservative Arabic text normalization for ingestion and retrieval queries.
+- Added search-term extraction for Arabic/English keyword matching.
+- Added hybrid retrieval mode that combines vector similarity with normalized keyword matches.
+- Added ChromaDB keyword candidate loading helper for mocked, local reranking.
+- Added safe Chroma collection reset script for reingesting normalized books.
+- Added tests for normalization, hybrid retrieval, and vector-store keyword loading.
+
 ### Improvement - Embedding Batching and Timeout Support for Large Book Ingestion
 - Ollama embedding timeout is configurable with `OLLAMA_EMBEDDING_TIMEOUT_SECONDS`.
 - Large book chunk embeddings are sent in sequential batches.
@@ -133,6 +141,10 @@ Milestone 5A - Admin PDF Ingestion API
 - Directory ingestion response schema
 - Mocked ingestion endpoint tests
 - README update
+- Arabic text normalization utilities
+- Hybrid vector + keyword retrieval
+- Chroma collection reset script
+- Retrieval quality tests
 
 ## Not Implemented Yet
 - OCR
@@ -222,6 +234,7 @@ pytest tests/test_rag_service.py -v
 pytest tests/test_chat_routes.py -v
 pytest tests/test_ingest_routes.py -v
 pytest tests/test_embedding_service.py -v
+pytest tests/test_arabic_text_utils.py -v
 
 ## Known Issues
 - Ollama models are not auto-pulled yet.
@@ -245,6 +258,7 @@ pytest tests/test_embedding_service.py -v
 - Ingestion endpoint tests use mocked ingestion service and do not call real Ollama or ChromaDB.
 - Real RAG smoke test script is manual and is not part of pytest.
 - Google embedding provider is not implemented yet.
+- ChromaDB must be reset and books must be reingested after Arabic normalization changes.
 
 ## Next Recommended Step
 Milestone 5B - Real Books Ingestion Smoke Test

@@ -59,6 +59,26 @@ def query_similar_chunks(
     return _normalize_query_results(raw_results)
 
 
+def get_chunks_for_keyword_search(
+    client: ChromaClient,
+    where: dict[str, object] | None = None,
+    limit: int | None = None,
+) -> list[dict[str, object]]:
+    """Return stored chunks for local keyword matching."""
+
+    if limit is not None and limit <= 0:
+        raise ValueError("limit must be greater than 0")
+
+    collection = client.get_or_create_collection()
+    raw_results = collection.get(
+        where=where,
+        limit=limit,
+        include=["documents", "metadatas"],
+    )
+
+    return _normalize_get_results(raw_results)
+
+
 def _validate_embedding(embedding: object, field_name: str) -> None:
     if not isinstance(embedding, list) or not embedding:
         raise ValueError(f"{field_name} must be a non-empty list of numbers")
@@ -84,6 +104,36 @@ def _normalize_query_results(raw_results: dict[str, Any]) -> list[dict[str, Any]
                 "text": documents[index] if index < len(documents) else "",
                 "metadata": metadatas[index] if index < len(metadatas) else {},
                 "distance": distances[index] if index < len(distances) else None,
+            },
+        )
+
+    return normalized_results
+
+
+def _normalize_get_results(raw_results: dict[str, Any]) -> list[dict[str, Any]]:
+    ids = raw_results.get("ids")
+    documents = raw_results.get("documents")
+    metadatas = raw_results.get("metadatas")
+
+    if not isinstance(ids, list):
+        ids = []
+    if not isinstance(documents, list):
+        documents = []
+    if not isinstance(metadatas, list):
+        metadatas = []
+
+    normalized_results: list[dict[str, Any]] = []
+    for index, result_id in enumerate(ids):
+        metadata = metadatas[index] if index < len(metadatas) else {}
+        if not isinstance(metadata, dict):
+            metadata = {}
+
+        normalized_results.append(
+            {
+                "id": result_id,
+                "text": documents[index] if index < len(documents) else "",
+                "metadata": metadata,
+                "distance": None,
             },
         )
 

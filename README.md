@@ -408,6 +408,26 @@ Current limitation:
 - No background jobs for very large books yet.
 - Endpoint tests use mocked ingestion service.
 
+## Retrieval Quality for Arabic PDFs
+
+The project uses hybrid retrieval:
+- vector similarity
+- keyword matching over normalized Arabic text
+
+Arabic normalization is applied during ingestion and query retrieval to reduce PDF extraction artifacts such as `االنقسام`.
+
+After changing normalization or embedding settings, reset Chroma and reingest:
+
+```bash
+docker compose exec ai-service python scripts/reset_chroma_collection.py
+```
+
+Then call:
+
+```http
+POST /api/v1/ingest/pdf
+```
+
 ## Run With Docker
 
 ```bash

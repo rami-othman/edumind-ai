@@ -17,6 +17,7 @@ class FakeCollection:
     def __init__(self, results: dict[str, object]) -> None:
         self.results = results
         self.query_call: dict[str, object] | None = None
+        self.get_call: dict[str, object] | None = None
 
     def query(
         self,
@@ -33,6 +34,24 @@ class FakeCollection:
             "include": include,
         }
         return self.results
+
+    def get(
+        self,
+        *,
+        where: dict[str, object] | None = None,
+        limit: int | None = None,
+        include: list[str],
+    ) -> dict[str, object]:
+        self.get_call = {
+            "where": where,
+            "limit": limit,
+            "include": include,
+        }
+        return {
+            "ids": [],
+            "documents": [],
+            "metadatas": [],
+        }
 
 
 class FakeVectorStoreClient:
@@ -131,7 +150,7 @@ def test_answer_question_with_rag_passes_question_top_k_and_where_to_retriever_f
         where={"subject": "physics"},
     )
 
-    assert embedding_service.received_question == "ما هو قانون أوم؟"
+    assert embedding_service.received_question == "\u0645\u0627 \u0647\u0648 \u0642\u0627\u0646\u0648\u0646 \u0627\u0648\u0645\u061f"
     assert vector_store_client.collection.query_call == {
         "query_embeddings": [[0.1, 0.2]],
         "n_results": 3,

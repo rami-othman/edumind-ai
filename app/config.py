@@ -44,6 +44,9 @@ class Settings(BaseSettings):
     chunk_size: int = 800
     chunk_overlap: int = 150
     top_k: int = 5
+    retrieval_mode: str = "hybrid"
+    keyword_candidate_limit: int = 1000
+    keyword_top_k: int = 10
 
     @field_validator("embedding_dimension", mode="before")
     @classmethod

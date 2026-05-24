@@ -3,6 +3,7 @@ import pytest
 from app.services.ingestion.metadata_builder import ChunkRecord
 from app.services.vector_store.vector_store_service import (
     add_chunk_records,
+    get_chunks_for_keyword_search,
     query_similar_chunks,
 )
 
@@ -11,6 +12,7 @@ class FakeCollection:
     def __init__(self) -> None:
         self.add_call: dict[str, object] | None = None
         self.query_call: dict[str, object] | None = None
+        self.get_call: dict[str, object] | None = None
 
     def add(
         self,
@@ -46,6 +48,24 @@ class FakeCollection:
             "documents": [["first text", "second text"]],
             "metadatas": [[{"page_number": 1}, {"page_number": 2}]],
             "distances": [[0.1, 0.2]],
+        }
+
+    def get(
+        self,
+        *,
+        where: dict[str, object] | None = None,
+        limit: int | None = None,
+        include: list[str],
+    ) -> dict[str, object]:
+        self.get_call = {
+            "where": where,
+            "limit": limit,
+            "include": include,
+        }
+        return {
+            "ids": ["chunk-1", "chunk-2"],
+            "documents": ["first text", "second text"],
+            "metadatas": [{"page_number": 1}, {"page_number": 2}],
         }
 
 
@@ -169,3 +189,39 @@ def test_query_similar_chunks_rejects_invalid_query_embedding() -> None:
 def test_query_similar_chunks_rejects_invalid_top_k() -> None:
     with pytest.raises(ValueError, match="top_k must be greater than 0"):
         query_similar_chunks([0.1], FakeClient(FakeCollection()), top_k=0)
+
+
+def test_get_chunks_for_keyword_search_calls_collection_get_with_expected_arguments() -> None:
+    collection = FakeCollection()
+    client = FakeClient(collection)
+
+    get_chunks_for_keyword_search(
+        client,
+        where={"subject": "biology"},
+        limit=100,
+    )
+
+    assert collection.get_call == {
+        "where": {"subject": "biology"},
+        "limit": 100,
+        "include": ["documents", "metadatas"],
+    }
+
+
+def test_get_chunks_for_keyword_search_returns_normalized_chunk_dictionaries() -> None:
+    results = get_chunks_for_keyword_search(FakeClient(FakeCollection()))
+
+    assert results == [
+        {
+            "id": "chunk-1",
+            "text": "first text",
+            "metadata": {"page_number": 1},
+            "distance": None,
+        },
+        {
+            "id": "chunk-2",
+            "text": "second text",
+            "metadata": {"page_number": 2},
+            "distance": None,
+        },
+    ]
