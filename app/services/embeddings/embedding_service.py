@@ -20,6 +20,12 @@ def get_embedding_client(settings: Settings | None = None) -> OllamaEmbeddingCli
             base_url=getattr(active_settings, "ollama_embedding_base_url", None)
             or active_settings.ollama_base_url,
             model=active_settings.ollama_embedding_model,
+            timeout_seconds=getattr(
+                active_settings,
+                "ollama_embedding_timeout_seconds",
+                180,
+            ),
+            batch_size=getattr(active_settings, "embedding_batch_size", 32),
         )
 
     # TODO: Add a Google embedding provider in a later milestone.

@@ -5,6 +5,13 @@ Milestone 5A - Admin PDF Ingestion API
 
 ## Current Status Updates
 
+### Improvement - Embedding Batching and Timeout Support for Large Book Ingestion
+- Ollama embedding timeout is configurable with `OLLAMA_EMBEDDING_TIMEOUT_SECONDS`.
+- Large book chunk embeddings are sent in sequential batches.
+- Embedding batch size is configurable with `EMBEDDING_BATCH_SIZE`.
+- Embedding batch errors include safe batch/status details.
+- Unit tests mock Ollama and do not call real embedding services.
+
 ### Improvement - Simplified Admin Books Ingestion Endpoint
 - `/api/v1/ingest/pdf` now ingests server-local book PDFs.
 - Default directory comes from `BOOKS_DIR`.
@@ -120,6 +127,8 @@ Milestone 5A - Admin PDF Ingestion API
 - Books directory setting
 - Subject inference from folder names
 - Books grade/language/source type settings
+- Embedding batching for large book ingestion
+- Configurable Ollama embedding timeout
 - Ingestion service dependency
 - Directory ingestion response schema
 - Mocked ingestion endpoint tests
@@ -212,6 +221,7 @@ pytest tests/test_llm_service.py -v
 pytest tests/test_rag_service.py -v
 pytest tests/test_chat_routes.py -v
 pytest tests/test_ingest_routes.py -v
+pytest tests/test_embedding_service.py -v
 
 ## Known Issues
 - Ollama models are not auto-pulled yet.

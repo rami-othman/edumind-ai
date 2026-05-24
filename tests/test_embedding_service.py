@@ -38,7 +38,10 @@ def _settings(provider: str = "ollama") -> SimpleNamespace:
     return SimpleNamespace(
         embedding_provider=provider,
         ollama_base_url="http://ollama.test",
+        ollama_embedding_base_url="http://ollama.test",
         ollama_embedding_model="nomic-embed-text",
+        ollama_embedding_timeout_seconds=180,
+        embedding_batch_size=32,
     )
 
 
@@ -66,6 +69,98 @@ def test_embed_texts_returns_embeddings_for_multiple_texts(
         [0.1, 0.2],
         [0.3, 0.4],
     ]
+
+
+def test_embed_texts_batches_input_when_batch_size_is_small(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    received_batches: list[list[str]] = []
+
+    def fake_post(self: httpx.Client, url: str, json: dict[str, Any]) -> MockResponse:
+        batch = list(json["input"])
+        received_batches.append(batch)
+        return MockResponse({"embeddings": [[float(len(received_batches))] for _ in batch]})
+
+    monkeypatch.setattr(httpx.Client, "post", fake_post)
+
+    client = OllamaEmbeddingClient(
+        "http://ollama.test",
+        "nomic-embed-text",
+        batch_size=2,
+    )
+
+    assert client.embed_texts(["one", "two", "three", "four", "five"]) == [
+        [1.0],
+        [1.0],
+        [2.0],
+        [2.0],
+        [3.0],
+    ]
+    assert received_batches == [["one", "two"], ["three", "four"], ["five"]]
+
+
+def test_embed_texts_preserves_embedding_order_across_batches(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def fake_post(self: httpx.Client, url: str, json: dict[str, Any]) -> MockResponse:
+        embeddings = [[float(len(text))] for text in json["input"]]
+        return MockResponse({"embeddings": embeddings})
+
+    monkeypatch.setattr(httpx.Client, "post", fake_post)
+
+    client = OllamaEmbeddingClient(
+        "http://ollama.test",
+        "nomic-embed-text",
+        batch_size=2,
+    )
+
+    assert client.embed_texts(["a", "bbbb", "cc"]) == [[1.0], [4.0], [2.0]]
+
+
+def test_embed_texts_batch_failure_raises_clear_embedding_client_error(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    request_count = 0
+
+    def fake_post(self: httpx.Client, url: str, json: dict[str, Any]) -> MockResponse:
+        nonlocal request_count
+        request_count += 1
+        if request_count == 2:
+            return MockResponse({"error": "timeout"}, status_code=400)
+        return MockResponse({"embeddings": [[0.1] for _ in json["input"]]})
+
+    monkeypatch.setattr(httpx.Client, "post", fake_post)
+
+    client = OllamaEmbeddingClient(
+        "http://ollama.test",
+        "nomic-embed-text",
+        batch_size=2,
+    )
+
+    with pytest.raises(
+        EmbeddingClientError,
+        match="Ollama embedding batch 2 failed with status 400",
+    ):
+        client.embed_texts(["one", "two", "three"])
+
+
+def test_get_embedding_client_uses_timeout_and_batch_size_from_settings() -> None:
+    from app.services.embeddings.embedding_service import get_embedding_client
+
+    client = get_embedding_client(
+        SimpleNamespace(
+            embedding_provider="ollama",
+            ollama_base_url="http://ollama.test",
+            ollama_embedding_base_url="http://ollama.embeddings.test",
+            ollama_embedding_model="nomic-embed-text",
+            ollama_embedding_timeout_seconds=240,
+            embedding_batch_size=16,
+        ),
+    )
+
+    assert client.base_url == "http://ollama.embeddings.test"
+    assert client.timeout_seconds == 240
+    assert client.batch_size == 16
 
 
 def test_embed_text_rejects_empty_text() -> None:

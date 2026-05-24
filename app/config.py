@@ -25,9 +25,11 @@ class Settings(BaseSettings):
     ollama_api_key: str | None = None
     ollama_llm_model: str = "deepseek-v4-pro:cloud"
     ollama_embedding_model: str = "nomic-embed-text"
+    ollama_embedding_timeout_seconds: int = 180
 
     llm_provider: str = "ollama"
     embedding_provider: str = "ollama"
+    embedding_batch_size: int = 32
     embedding_dimension: int | None = None
     google_embedding_model: str = "gemini-embedding-2"
     google_embedding_dimension: int = 768

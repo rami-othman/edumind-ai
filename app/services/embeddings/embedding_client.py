@@ -18,11 +18,15 @@ class OllamaEmbeddingClient:
         self,
         base_url: str,
         model: str,
-        timeout_seconds: float = 30.0,
+        timeout_seconds: float = 180.0,
+        batch_size: int = 32,
     ) -> None:
         self.base_url = base_url.rstrip("/")
         self.model = model
         self.timeout_seconds = timeout_seconds
+        if batch_size <= 0:
+            raise ValueError("batch_size must be greater than 0")
+        self.batch_size = batch_size
 
     def embed_text(self, text: str) -> list[float]:
         """Embed one text value."""
@@ -38,9 +42,23 @@ class OllamaEmbeddingClient:
         """Embed multiple text values."""
         _validate_texts(texts)
 
-        return self._request_embeddings(texts)
+        embeddings: list[list[float]] = []
+        for batch_index, batch in enumerate(_batch_texts(texts, self.batch_size), start=1):
+            batch_embeddings = self._request_embeddings(batch, batch_index=batch_index)
+            if len(batch_embeddings) != len(batch):
+                raise EmbeddingClientError(
+                    f"Ollama embedding batch {batch_index} returned "
+                    f"{len(batch_embeddings)} embeddings for {len(batch)} texts",
+                )
+            embeddings.extend(batch_embeddings)
 
-    def _request_embeddings(self, input_value: str | list[str]) -> list[list[float]]:
+        return embeddings
+
+    def _request_embeddings(
+        self,
+        input_value: str | list[str],
+        batch_index: int | None = None,
+    ) -> list[list[float]]:
         embed_url = f"{self.base_url}/api/embed"
         payload = {
             "model": self.model,
@@ -51,7 +69,18 @@ class OllamaEmbeddingClient:
             with httpx.Client(timeout=self.timeout_seconds) as client:
                 response = client.post(embed_url, json=payload)
                 response.raise_for_status()
+        except httpx.HTTPStatusError as exc:
+            if batch_index is not None:
+                raise EmbeddingClientError(
+                    "Ollama embedding batch "
+                    f"{batch_index} failed with status {exc.response.status_code}",
+                ) from exc
+            raise EmbeddingClientError("Ollama embedding request failed") from exc
         except httpx.HTTPError as exc:
+            if batch_index is not None:
+                raise EmbeddingClientError(
+                    f"Ollama embedding batch {batch_index} failed: {exc.__class__.__name__}",
+                ) from exc
             raise EmbeddingClientError("Ollama embedding request failed") from exc
 
         response_payload = response.json()
@@ -76,6 +105,10 @@ def _validate_texts(texts: list[str]) -> None:
 
     for text in texts:
         _validate_text(text)
+
+
+def _batch_texts(texts: list[str], batch_size: int) -> list[list[str]]:
+    return [texts[index : index + batch_size] for index in range(0, len(texts), batch_size)]
 
 
 def _validate_embedding(embedding: Any) -> list[float]:

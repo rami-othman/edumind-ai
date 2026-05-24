@@ -41,6 +41,8 @@ Milestone 5A - Admin PDF Ingestion API
 - Embedding provider configuration
 - Ollama embedding client using `/api/embed`
 - Embedding service abstraction
+- Embedding batching for large book ingestion
+- Configurable embedding request timeout
 - Mocked embedding service tests
 - Future Google embedding placeholder configuration
 - ChromaDB client wrapper
@@ -214,6 +216,10 @@ Current provider:
 
 Default model:
 - `nomic-embed-text`
+
+Large book ingestion sends chunk embeddings in sequential batches instead of one large request.
+Configure the batch size with `EMBEDDING_BATCH_SIZE`.
+Configure the Ollama embedding timeout with `OLLAMA_EMBEDDING_TIMEOUT_SECONDS`.
 
 Future provider planned:
 - Google Gemini Embedding 2
@@ -399,7 +405,7 @@ Metadata:
 
 Current limitation:
 - No authentication yet.
-- No batch large-book ingestion yet.
+- No background jobs for very large books yet.
 - Endpoint tests use mocked ingestion service.
 
 ## Run With Docker
