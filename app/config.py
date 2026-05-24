@@ -34,6 +34,10 @@ class Settings(BaseSettings):
 
     upload_dir: str = "/app/data/uploads"
     processed_dir: str = "/app/data/processed"
+    books_dir: str = "/app/data/uploads/books"
+    books_grade: str = "12"
+    books_language: str = "arabic"
+    books_source_type: str = "admin_uploaded_book"
 
     chunk_size: int = 800
     chunk_overlap: int = 150

@@ -1,9 +1,17 @@
 # PROJECT_STATUS.md - EduMind AI Service
 
 ## Current Milestone
-Milestone 4E - Real RAG Smoke Test Script
+Milestone 5A - Admin PDF Ingestion API
 
 ## Current Status Updates
+
+### Improvement - Simplified Admin Books Ingestion Endpoint
+- `/api/v1/ingest/pdf` now ingests server-local book PDFs.
+- Default directory comes from `BOOKS_DIR`.
+- Subject is inferred from PDF parent folder names.
+- Grade and language come from settings.
+- Chunk size and chunk overlap come from settings.
+- Endpoint tests use a mocked ingestion service.
 
 ### Improvement - Source Citation and Smoke Test Output Readability
 - Improved source citation prompt rules for file name, page number, chunk index, subject, and lesson.
@@ -107,15 +115,24 @@ Milestone 4E - Real RAG Smoke Test Script
 - Concise real RAG smoke test output
 - Real RAG smoke test verbose mode
 - Retrieved chunk preview cleanup
+- `/api/v1/ingest/pdf`
+- Server-local books directory ingestion
+- Books directory setting
+- Subject inference from folder names
+- Books grade/language/source type settings
+- Ingestion service dependency
+- Directory ingestion response schema
+- Mocked ingestion endpoint tests
 - README update
 
 ## Not Implemented Yet
 - OCR
-- Real admin upload endpoint
-- Automatic real book ingestion
+- Authentication/admin authorization
+- Batch ingestion of large books
+- Ingestion status jobs/background tasks
+- Ingestion progress tracking
 - Document ID generation strategy
 - Google embedding provider
-- Authentication
 - Chat history
 - Ollama generation
 - Real frontend/backend integration
@@ -127,9 +144,12 @@ Milestone 4E - Real RAG Smoke Test Script
 ## Modified Files
 - `app/api/health_routes.py`
 - `app/api/chat_routes.py`
+- `app/api/ingest_routes.py`
 - `app/schemas/chat_schema.py`
+- `app/schemas/ingest_schema.py`
 - `app/dependencies.py`
 - `app/main.py`
+- `app/utils/file_utils.py`
 - `scripts/smoke_test_real_rag.py`
 - `docker-compose.yml`
 - `app/services/llm/ollama_client.py`
@@ -151,6 +171,7 @@ Milestone 4E - Real RAG Smoke Test Script
 - `tests/test_llm_service.py`
 - `tests/test_rag_service.py`
 - `tests/test_chat_routes.py`
+- `tests/test_ingest_routes.py`
 - `tests/test_dependency_health.py`
 - `tests/test_pdf_extractor.py`
 - `tests/test_text_cleaner.py`
@@ -162,6 +183,7 @@ Milestone 4E - Real RAG Smoke Test Script
 - `tests/test_vector_store_service.py`
 - `tests/test_retriever.py`
 - `tests/test_prompt_builder.py`
+- `tests/test_docker_foundation.py`
 - `README.md`
 - `PROJECT_STATUS.md`
 - `.env.example`
@@ -189,7 +211,7 @@ pytest tests/test_prompt_builder.py -v
 pytest tests/test_llm_service.py -v
 pytest tests/test_rag_service.py -v
 pytest tests/test_chat_routes.py -v
-pytest tests/test_prompt_builder.py -v
+pytest tests/test_ingest_routes.py -v
 
 ## Known Issues
 - Ollama models are not auto-pulled yet.
@@ -197,12 +219,12 @@ pytest tests/test_prompt_builder.py -v
 - OCR is not implemented yet; scanned/image-only PDFs may return empty page text.
 - Semantic chunking is not implemented yet.
 - Document IDs are not generated automatically yet.
-- Ingestion-to-vector-store orchestration is not exposed through an API endpoint yet.
-- Automatic real book ingestion is not implemented yet.
 - Authentication is not implemented yet.
+- Admin authorization is not implemented yet.
+- Background jobs for very large books are not implemented yet.
+- Ingestion status jobs/background tasks are not implemented yet.
+- Ingestion progress tracking is not implemented yet.
 - Chat history is not implemented yet.
-- Production admin ingestion endpoint is not implemented yet.
-- Automatic large book ingestion is not implemented yet.
 - Real Ollama Cloud requires `OLLAMA_API_KEY` in local `.env`.
 - Vector store tests use mocks and do not require a real ChromaDB container.
 - Ingestion-to-vector-store tests use mocks and do not require real Ollama or ChromaDB.
@@ -210,13 +232,12 @@ pytest tests/test_prompt_builder.py -v
 - Prompt builder tests are deterministic and do not call an LLM.
 - LLM and RAG service tests use mocks and do not call real Ollama or ChromaDB.
 - Chat endpoint tests use mocked RAG service.
+- Ingestion endpoint tests use mocked ingestion service and do not call real Ollama or ChromaDB.
 - Real RAG smoke test script is manual and is not part of pytest.
 - Google embedding provider is not implemented yet.
 
 ## Next Recommended Step
-Milestone 5A - Admin PDF Ingestion API
-- Implement `POST /api/v1/ingest/pdf`
-- Accept PDF + metadata
-- Run ingestion to vector store
-- Return ingestion summary
-- Add endpoint tests with mocked services
+Milestone 5B - Real Books Ingestion Smoke Test
+- Run `/api/v1/ingest/pdf` on the local books directory
+- Verify ChromaDB stores all chunks
+- Ask `/api/v1/chat/ask` with subject filters

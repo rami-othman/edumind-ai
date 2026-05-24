@@ -2,6 +2,11 @@
 
 from app.config import Settings, get_settings
 from app.services.embeddings import embedding_service
+from app.services.ingestion.ingestion_service import (
+    IngestionStorageResult,
+    ingest_pdf_to_vector_store,
+)
+from app.services.ingestion.metadata_builder import DocumentMetadata
 from app.services.llm import llm_service
 from app.services.rag.rag_service import RagAnswer, answer_question_with_rag
 from app.services.vector_store.chroma_client import build_chroma_client
@@ -53,7 +58,40 @@ class LLMServiceDependency:
         )
 
 
+class IngestionServiceDependency:
+    """Thin dependency wrapper around PDF ingestion-to-vector-store orchestration."""
+
+    def __init__(self, settings: Settings) -> None:
+        self.settings = settings
+
+    def ingest_pdf(
+        self,
+        *,
+        file_path: str,
+        document_metadata: DocumentMetadata,
+        chunk_size: int,
+        chunk_overlap: int,
+    ) -> IngestionStorageResult:
+        embedding_client = embedding_service.get_embedding_client(self.settings)
+        vector_store_client = build_chroma_client(self.settings)
+
+        return ingest_pdf_to_vector_store(
+            file_path=file_path,
+            document_metadata=document_metadata,
+            embedding_service=embedding_client,
+            vector_store_client=vector_store_client,
+            chunk_size=chunk_size,
+            chunk_overlap=chunk_overlap,
+        )
+
+
 def get_rag_service() -> RagServiceDependency:
     """Provide a RAG service dependency that can be overridden in tests."""
 
     return RagServiceDependency(get_settings())
+
+
+def get_ingestion_service() -> IngestionServiceDependency:
+    """Provide an ingestion service dependency that can be overridden in tests."""
+
+    return IngestionServiceDependency(get_settings())

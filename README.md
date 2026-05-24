@@ -6,7 +6,7 @@ The service will support admin educational content ingestion, PDF text extractio
 
 ## Current Milestone
 
-Milestone 4E - Real RAG Smoke Test Script
+Milestone 5A - Admin PDF Ingestion API
 
 ## Implemented
 
@@ -83,6 +83,13 @@ Milestone 4E - Real RAG Smoke Test Script
 - Real ChromaDB storage path
 - Real RAG answer path through Ollama Cloud
 - Smoke test CLI configuration overrides
+- `/api/v1/ingest/pdf` endpoint
+- Server-local books directory ingestion
+- Subject inference from parent folder names
+- Books metadata settings for grade, language, and source type
+- Ingestion service dependency injection for routes
+- Directory ingestion response schema
+- Ingestion endpoint tests with mocked ingestion service
 
 ## Planned Architecture
 
@@ -115,9 +122,9 @@ docker/               Dockerfile and entrypoint placeholders
 
 The current system has no teacher role. Content is uploaded by admins only.
 
-This milestone intentionally does not include OCR, API upload logic, production admin ingestion, automatic large book ingestion, Google embedding provider, authentication, chat history, exam generation, or answer evaluation.
+This milestone intentionally does not include OCR, authentication, role management, automatic large book ingestion, Google embedding provider, chat history, exam generation, or answer evaluation.
 
-AI logic is not implemented yet. ChromaDB and Ollama run as containers, but models are not auto-pulled.
+ChromaDB and Ollama run as containers, but models are not auto-pulled.
 
 ## PDF Extraction Foundation
 
@@ -192,9 +199,9 @@ PDF extraction -> Arabic text cleaning -> chunking -> metadata records
 This prepares content for future embeddings and ChromaDB storage.
 
 Current limitation:
-- It does not store chunks in ChromaDB yet.
-- It does not generate embeddings yet.
-- It does not expose an API upload endpoint yet.
+- API ingestion is single-PDF only.
+- OCR is not implemented yet.
+- Batch large-book ingestion is not implemented yet.
 
 ## Embedding Client Foundation
 
@@ -226,8 +233,6 @@ It supports:
 - querying similar chunks by query embedding
 
 Current limitation:
-- The storage orchestration is not exposed through an API endpoint yet.
-- RAG is not implemented yet.
 - Tests use mocks and do not require a real ChromaDB container.
 
 ## Ingestion to Vector Store Integration
@@ -239,8 +244,6 @@ PDF extraction -> cleaning -> chunking -> metadata -> embeddings -> ChromaDB vec
 This stores chunk records with precomputed embeddings.
 
 Current limitation:
-- RAG answer generation is not implemented yet.
-- Chat endpoint is not connected yet.
 - Tests use fakes/mocks and do not require real Ollama or ChromaDB.
 
 ## Retriever Foundation
@@ -252,8 +255,7 @@ The project now includes a retriever in:
 It embeds a user question, queries similar chunks from the vector store, and returns normalized retrieved source chunks.
 
 Current limitation:
-- It does not generate final AI answers yet.
-- It is not connected to the chat API yet.
+- Unit tests mock vector store calls.
 
 ## RAG Prompt Builder
 
@@ -279,7 +281,6 @@ The current LLM provider is Ollama. The project can use local Ollama models or O
 `deepseek-v4-pro:cloud`
 
 Current limitation:
-- The chat API endpoint is not implemented yet.
 - Unit tests mock LLM calls.
 - Real Ollama Cloud requires `OLLAMA_API_KEY` in `.env`.
 
@@ -352,6 +353,55 @@ Requirements:
 - `nomic-embed-text` pulled in Ollama
 - `OLLAMA_API_KEY` set in local `.env` for Ollama Cloud
 
+## Admin Books Ingestion API
+
+Endpoint:
+
+`POST /api/v1/ingest/pdf`
+
+This endpoint ingests PDF books already stored on the server.
+
+Default directory:
+
+`/app/data/uploads/books`
+
+Expected structure:
+
+```txt
+data/uploads/books/
+├── biology/
+├── math/
+└── physics/
+```
+
+Example:
+
+```bash
+curl -X POST http://localhost:8001/api/v1/ingest/pdf \
+  -H "Content-Type: application/json" \
+  -d "{}"
+```
+
+Optional custom directory:
+
+```bash
+curl -X POST http://localhost:8001/api/v1/ingest/pdf \
+  -H "Content-Type: application/json" \
+  -d "{\"books_dir\":\"/app/data/uploads/books\"}"
+```
+
+Metadata:
+- grade comes from `BOOKS_GRADE`
+- subject is inferred from folder name
+- language comes from `BOOKS_LANGUAGE`
+- source type comes from `BOOKS_SOURCE_TYPE`
+- chunk settings come from `.env`
+
+Current limitation:
+- No authentication yet.
+- No batch large-book ingestion yet.
+- Endpoint tests use mocked ingestion service.
+
 ## Run With Docker
 
 ```bash
@@ -396,6 +446,7 @@ pytest tests/test_prompt_builder.py -v
 pytest tests/test_llm_service.py -v
 pytest tests/test_rag_service.py -v
 pytest tests/test_chat_routes.py -v
+pytest tests/test_ingest_routes.py -v
 pytest -v
 ```
 
@@ -416,4 +467,4 @@ Expected `/health` response:
 
 ## Next Recommended Step
 
-Milestone 5A - Admin PDF Ingestion API.
+Milestone 5B - Real Admin Ingestion Smoke Test.
